@@ -1,6 +1,6 @@
 <?php
-// auteur: Vul hier je naam in
-// functie: algemene functies tbv hergebruik
+// auteur: Thierry Chatoorang
+// functie: algemene functies hergebruik
 
 include_once "config.php";
 

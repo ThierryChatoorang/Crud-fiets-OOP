@@ -11,9 +11,6 @@
     // Autoloading via Composer
     require_once __DIR__ . '/../vendor/autoload.php';
 
-    // Of zonder Composer (handmatige includes):
-    // require_once __DIR__ . '/classes/DatabaseManager.php';
-    // require_once __DIR__ . '/classes/Fiets.php';
 
     // Gebruik de classes met volledige namespace
     $db = new CrudFietsOOP\DatabaseManager();

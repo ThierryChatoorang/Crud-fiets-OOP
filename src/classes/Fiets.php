@@ -1,7 +1,7 @@
 <?php
 /**
  * Fiets.php
- * Auteur: [Jouw naam]
+ * Auteur: Thierry Chatoorang
  * Class voor een fiets object
  */
 

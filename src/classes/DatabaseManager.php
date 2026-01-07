@@ -1,7 +1,7 @@
 <?php
 /**
  * DatabaseManager.php
- * Auteur: [Jouw naam]
+ * Auteur: Thierry Chatoorang
  * Class voor database operaties (CRUD)
  */
 
