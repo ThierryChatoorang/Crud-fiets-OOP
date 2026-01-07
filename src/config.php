@@ -1,5 +1,5 @@
 <?php
-// auteur: Vul hier je naam in
+// auteur: Thierry Chatoorang
 // functie: configuratiebestand
 
 define("DATABASE", "fietsenmaker");

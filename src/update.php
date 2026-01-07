@@ -1,58 +1,85 @@
 <?php
-    // functie: update fiets
-    // auteur: Vul hier je naam in
+// Autoloading via Composer
+require_once __DIR__ . '/../vendor/autoload.php';
 
-    require_once('functions.php');
+// Of zonder Composer (handmatige includes):
+// require_once __DIR__ . '/classes/DatabaseManager.php';
+// require_once __DIR__ . '/classes/Fiets.php';
 
-    // Test of er op de wijzig-knop is gedrukt 
-    if(isset($_POST['btn_wzg'])){
+$db = new CrudFietsOOP\DatabaseManager();
+$message = '';
+$fiets = null;
 
-        // test of update gelukt is
-        if(updateRecord($_POST) == true){
-            echo "<script>alert('Fiets is gewijzigd')</script>";
+// Check of er op wijzig-knop is gedrukt
+if (isset($_POST['btn_wzg'])) {
+    try {
+        $fiets = new CrudFietsOOP\Fiets([
+            'id' => (int)$_POST['id'],
+            'merk' => $_POST['merk'],
+            'type' => $_POST['type'],
+            'prijs' => (float)$_POST['prijs'],
+            'foto' => $_POST['foto'] ?? ''
+        ]);
+
+        if ($db->updateRecord($fiets)) {
+            $message = '<script>alert("Fiets is gewijzigd"); window.location.href="index.php";</script>';
         } else {
-            echo '<script>alert("Fiets is NIET gewijzigd")</script>';
+            $message = '<script>alert("Fiets is NIET gewijzigd");</script>';
         }
+    } catch (Exception $e) {
+        $message = '<script>alert("Fout: ' . $e->getMessage() . '");</script>';
     }
+}
 
-    // Test of id is meegegeven in de URL
-    if(isset($_GET['id'])){  
-        // Haal alle info van de betreffende id $_GET['id']
-        $id = $_GET['id'];
-        $row = getRecord($id);
-      } else {
-          echo "Geen id opgegeven<br>";
-          exit;
-      }
-  ?> 
+// Check of id is meegegeven in URL
+if (isset($_GET['id'])) {
+    $id = (int)$_GET['id'];
+    $fietsData = $db->getRecord($id);
+    
+    if ($fietsData) {
+        $fiets = new CrudFietsOOP\Fiets($fietsData);
+    } else {
+        $message = '<script>alert("Fiets niet gevonden"); window.location.href="index.php";</script>';
+    }
+} else {
+    $message = '<script>alert("Geen id opgegeven"); window.location.href="index.php";</script>';
+}
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <title>Wijzig Fiets</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wijzig Fiets</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Wijzig Fiets</h2>
-  <form method="post">
+    <?= $message ?>
     
-    <input type="hidden" id="merk" name="id" required value="<?php echo $row['id']; ?>"><br>
-    <label for="merk">Merk:</label>
-    <input type="text" id="merk" name="merk" required value="<?php echo $row['merk']; ?>"><br>
+    <h2>Wijzig Fiets</h2>
+    
+    <?php if ($fiets): ?>
+    <form method="post">
+        <input type="hidden" name="id" value="<?= $fiets->getId() ?>">
+        
+        <label for="merk">Merk:</label>
+        <input type="text" id="merk" name="merk" required value="<?= htmlspecialchars($fiets->getMerk()) ?>"><br>
 
-    <label for="type">Type:</label>
-    <input type="text" id="type" name="type" required value="<?php echo $row['type']; ?>"><br>
+        <label for="type">Type:</label>
+        <input type="text" id="type" name="type" required value="<?= htmlspecialchars($fiets->getType()) ?>"><br>
 
-    <label for="prijs">Prijs:</label>
-    <input type="number" id="prijs" name="prijs" required value="<?php echo $row['prijs']; ?>"><br>
+        <label for="prijs">Prijs:</label>
+        <input type="number" step="0.01" id="prijs" name="prijs" required value="<?= $fiets->getPrijs() ?>"><br>
 
-    <button type="submit" name="btn_wzg">Wijzig</button>
-  </form>
-  <br><br>
-  <a href='index.php'>Home</a>
+        <label for="foto">Foto:</label>
+        <input type="text" id="foto" name="foto" value="<?= htmlspecialchars($fiets->getFoto()) ?>"><br>
+
+        <button type="submit" name="btn_wzg">Wijzig</button>
+    </form>
+    <?php endif; ?>
+    
+    <br><br>
+    <a href='index.php'>Home</a>
 </body>
 </html>
 

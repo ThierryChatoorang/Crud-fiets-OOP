@@ -1,26 +1,50 @@
 <?php
-    // functie: formulier en database insert fiets
-    // auteur: Vul hier je naam in
+// Autoloading via Composer
+require_once __DIR__ . '/../vendor/autoload.php';
 
-    echo "<h1>Insert Fiets</h1>";
+// Of zonder Composer (handmatige includes):
+// require_once __DIR__ . '/classes/DatabaseManager.php';
+// require_once __DIR__ . '/classes/Fiets.php';
 
-    require_once('functions.php');
-	 
-    // Test of er op de insert-knop is gedrukt 
-    if(isset($_POST) && isset($_POST['btn_ins'])){
+$db = new CrudFietsOOP\DatabaseManager();
+$message = '';
 
-        // test of insert gelukt is
-        if(insertRecord($_POST) == true){
-            echo "<script>alert('Fiets is toegevoegd')</script>";
+// Check of er op insert-knop is gedrukt
+if (isset($_POST['btn_ins'])) {
+    try {
+        // Maak nieuwe fiets
+        $fiets = new CrudFietsOOP\Fiets([
+            'merk' => $_POST['merk'],
+            'type' => $_POST['type'],
+            'prijs' => (float)$_POST['prijs'],
+            'foto' => $_POST['foto'] ?? ''
+        ]);
+
+        // Voeg toe aan database
+        if ($db->insertRecord($fiets)) {
+            $message = '<script>alert("Fiets is toegevoegd"); window.location.href="index.php";</script>';
         } else {
-            // Foutmelding wordt al geprint in de functie insertRecord
+            $message = '<script>alert("Fiets is NIET toegevoegd");</script>';
         }
+    } catch (Exception $e) {
+        $message = '<script>alert("Fout: ' . $e->getMessage() . '");</script>';
     }
+}
 ?>
-<html>
-    <body>
-        <form method="post">
-
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiets Toevoegen</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <?= $message ?>
+    
+    <h1>Insert Fiets</h1>
+    
+    <form method="post">
         <label for="merk">Merk:</label>
         <input type="text" id="merk" name="merk" required><br>
 
@@ -28,12 +52,15 @@
         <input type="text" id="type" name="type" required><br>
 
         <label for="prijs">Prijs:</label>
-        <input type="number" id="prijs" name="prijs" required><br>
+        <input type="number" step="0.01" id="prijs" name="prijs" required><br>
+
+        <label for="foto">Foto:</label>
+        <input type="text" id="foto" name="foto"><br>
 
         <button type="submit" name="btn_ins">Insert</button>
-        </form>
-        
-        <br><br>
-        <a href='index.php'>Home</a>
-    </body>
+    </form>
+    
+    <br><br>
+    <a href='index.php'>Home</a>
+</body>
 </html>
